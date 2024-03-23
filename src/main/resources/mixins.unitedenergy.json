@@ -1,0 +1,13 @@
+{
+  "compatibilityLevel": "JAVA_8",
+  "package": "igentuman.ee.mixin",
+  "refmap": "refmap.ue.json",
+  "mixins": [
+    "TileEntityInventoryMixin",
+    "IuGuiElectricBlockMixin",
+    "IuComponentMixin"
+  ],
+  "client": [
+  ],
+  "server": []
+}

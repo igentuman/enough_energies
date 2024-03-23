@@ -1,0 +1,100 @@
+buildscript {
+    repositories {
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://repo.spongepowered.org/maven' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+    }
+}
+
+repositories {
+    maven {
+        url "https://cursemaven.com"
+    }
+    maven { url = 'https://repo.spongepowered.org/maven' }
+}
+        
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.spongepowered.mixin'
+
+version = '1.0.0'
+group = 'igentuman.ee'
+archivesBaseName = 'enoughEnergies'
+
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+
+configurations {
+    embed
+    compile.extendsFrom(embed)
+}
+
+minecraft {
+    
+    mappings channel: 'snapshot', version: '20171003-1.12'
+    
+     accessTransformer = file('src/main/resources/ue_ac.cfg')
+
+  
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+            arg '-torg.spongepowered.asm.launch.MixinTweaker'
+        }
+
+        server {
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+            arg '-torg.spongepowered.asm.launch.MixinTweaker'
+        }
+    }
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2860'
+    embed('org.spongepowered:mixin:0.8.3-SNAPSHOT') {
+        exclude module: 'guava'
+        exclude module: 'commons-io'
+        exclude module: 'gson'
+    }
+    implementation fg.deobf("curse.maven:industrial-upgrade-372007:4998877")
+    runtimeOnly "curse.maven:mekanism-unofficial-edition-v10-edition-840735:4464199"
+}
+
+mixin {
+    add sourceSets.main, 'refmap.${mod_id}.json'.replace('${mod_id}', 'unitedenergy')
+    config 'mixins.${mod_id}.json'.replace('${mod_id}', 'unitedenergy')
+}
+
+// Example for how to get properties into the manifest for reading by the runtime..
+jar {
+    from {
+        configurations.embed.collect { it.isDirectory() ? it : zipTree(it) }
+    } {
+        exclude 'LICENSE.txt', 'META-INF/MANIFSET.MF', 'META-INF/maven/**', 'META-INF/*.RSA', 'META-INF/*.SF'
+    }
+
+    manifest {
+        attributes([
+            "Specification-Title": "unitedenergy",
+            "Specification-Vendor": "unitedenergysareus",
+            "Specification-Version": "1",
+            "Implementation-Title": project.name,
+            "Implementation-Version": "${version}",
+            "Implementation-Vendor" :"unitedenergysareus",
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            'ForceLoadAsMod': 'true',
+            'FMLCorePluginContainsFMLMod': 'true',
+            'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
+            'TweakOrder': '0'
+        ])
+    }
+}
+
+
+jar.finalizedBy('reobfJar') 
+

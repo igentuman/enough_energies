@@ -1,0 +1,16 @@
+[
+{
+  "modid": "enoughenergies",
+  "name": "United Energy",
+  "description": "No more different energies.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["igentuman"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
